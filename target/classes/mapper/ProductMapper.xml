@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.industrial.trading.dao.ProductMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.industrial.trading.entity.Product">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="price" column="price"/>
+        <result property="unit" column="unit"/>
+        <result property="stock" column="stock"/>
+        <result property="brand" column="brand"/>
+        <result property="model" column="model"/>
+        <result property="specifications" column="specifications"/>
+        <result property="description" column="description"/>
+        <result property="mainImage" column="main_image"/>
+        <result property="images" column="images"/>
+        <result property="status" column="status"/>
+        <result property="sales" column="sales"/>
+        <result property="views" column="views"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <!-- 扩展结果映射(包含关联信息) -->
+    <resultMap id="ExtendedResultMap" type="com.industrial.trading.entity.Product" extends="BaseResultMap">
+        <association property="category" javaType="com.industrial.trading.entity.Category">
+            <id property="id" column="category_id"/>
+            <result property="name" column="category_name"/>
+        </association>
+        <association property="seller" javaType="com.industrial.trading.entity.User">
+            <id property="id" column="seller_id"/>
+            <result property="username" column="seller_username"/>
+            <result property="realName" column="seller_realname"/>
+            <result property="phone" column="seller_phone"/>
+            <result property="companyName" column="seller_company_name"/>
+        </association>
+    </resultMap>
+    
+    <!-- 根据ID查询商品 -->
+    <select id="selectById" resultMap="ExtendedResultMap">
+        SELECT p.*, c.name as category_name,
+               u.username as seller_username, u.realname as seller_realname, 
+               u.phone as seller_phone, u.company_name as seller_company_name
+        FROM product p
+        LEFT JOIN category c ON p.category_id = c.id
+        LEFT JOIN user u ON p.seller_id = u.id
+        WHERE p.id = #{id}
+    </select>
+    
+    <!-- 查询商品列表 -->
+    <select id="selectList" resultMap="ExtendedResultMap" parameterType="map">
+        SELECT p.*, c.name as category_name,
+               u.username as seller_username, u.realname as seller_realname, 
+               u.phone as seller_phone, u.company_name as seller_company_name
+        FROM product p
+        LEFT JOIN category c ON p.category_id = c.id
+        LEFT JOIN user u ON p.seller_id = u.id
+        <where>
+            <if test="categoryId != null">
+                AND p.category_id = #{categoryId}
+            </if>
+            <if test="sellerId != null">
+                AND p.seller_id = #{sellerId}
+            </if>
+            <if test="status != null">
+                AND p.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (p.name LIKE CONCAT('%', #{keyword}, '%') 
+                     OR p.brand LIKE CONCAT('%', #{keyword}, '%')
+                     OR p.model LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY p.create_time DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+    
+    <!-- 查询商品总数 -->
+    <select id="selectCount" resultType="int" parameterType="map">
+        SELECT COUNT(*) FROM product p
+        <where>
+            <if test="categoryId != null">
+                AND p.category_id = #{categoryId}
+            </if>
+            <if test="sellerId != null">
+                AND p.seller_id = #{sellerId}
+            </if>
+            <if test="status != null">
+                AND p.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (p.name LIKE CONCAT('%', #{keyword}, '%') 
+                     OR p.brand LIKE CONCAT('%', #{keyword}, '%')
+                     OR p.model LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+    
+    <!-- 插入商品 -->
+    <insert id="insert" parameterType="com.industrial.trading.entity.Product" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO product (name, category_id, seller_id, price, unit, stock, brand, model, 
+                           specifications, description, main_image, images, status)
+        VALUES (#{name}, #{categoryId}, #{sellerId}, #{price}, #{unit}, #{stock}, #{brand}, #{model}, 
+                #{specifications}, #{description}, #{mainImage}, #{images}, #{status})
+    </insert>
+    
+    <!-- 更新商品 -->
+    <update id="update" parameterType="com.industrial.trading.entity.Product">
+        UPDATE product
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="brand != null">brand = #{brand},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="specifications != null">specifications = #{specifications},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="mainImage != null">main_image = #{mainImage},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 更新商品状态 -->
+    <update id="updateStatus">
+        UPDATE product SET status = #{status} WHERE id = #{id}
+    </update>
+    
+    <!-- 增加商品浏览量 -->
+    <update id="increaseViewCount">
+        UPDATE product SET views = views + 1 WHERE id = #{id}
+    </update>
+    
+</mapper>

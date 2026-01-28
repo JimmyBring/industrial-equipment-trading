@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.industrial.trading.dao.LogisticsMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.industrial.trading.entity.Logistics">
+        <id property="id" column="id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="logisticsCompany" column="logistics_company"/>
+        <result property="logisticsNo" column="logistics_no"/>
+        <result property="senderName" column="sender_name"/>
+        <result property="senderPhone" column="sender_phone"/>
+        <result property="senderAddress" column="sender_address"/>
+        <result property="receiverName" column="receiver_name"/>
+        <result property="receiverPhone" column="receiver_phone"/>
+        <result property="receiverAddress" column="receiver_address"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <!-- 根据ID查询物流 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM logistics WHERE id = #{id}
+    </select>
+    
+    <!-- 根据订单ID查询物流 -->
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT * FROM logistics WHERE order_id = #{orderId}
+    </select>
+    
+    <!-- 插入物流 -->
+    <insert id="insert" parameterType="com.industrial.trading.entity.Logistics" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO logistics (order_id, order_no, logistics_company, logistics_no, sender_name, sender_phone, 
+                              sender_address, receiver_name, receiver_phone, receiver_address, status)
+        VALUES (#{orderId}, #{orderNo}, #{logisticsCompany}, #{logisticsNo}, #{senderName}, #{senderPhone}, 
+                #{senderAddress}, #{receiverName}, #{receiverPhone}, #{receiverAddress}, #{status})
+    </insert>
+    
+    <!-- 更新物流 -->
+    <update id="update" parameterType="com.industrial.trading.entity.Logistics">
+        UPDATE logistics
+        <set>
+            <if test="logisticsCompany != null">logistics_company = #{logisticsCompany},</if>
+            <if test="logisticsNo != null">logistics_no = #{logisticsNo},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+</mapper>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.industrial.trading.dao.ReportMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.industrial.trading.entity.Report">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="reportType" column="report_type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="images" column="images"/>
+        <result property="status" column="status"/>
+        <result property="adminReply" column="admin_reply"/>
+        <result property="createTime" column="create_time"/>
+        <result property="handleTime" column="handle_time"/>
+    </resultMap>
+    
+    <!-- 扩展结果映射(包含关联信息) -->
+    <resultMap id="ExtendedResultMap" type="com.industrial.trading.entity.Report" extends="BaseResultMap">
+        <association property="user" javaType="com.industrial.trading.entity.User">
+            <id property="id" column="user_id"/>
+            <result property="username" column="user_username"/>
+            <result property="realName" column="user_realname"/>
+        </association>
+    </resultMap>
+    
+    <!-- 根据ID查询举报 -->
+    <select id="selectById" resultMap="ExtendedResultMap">
+        SELECT r.*, u.username as user_username, u.realname as user_realname
+        FROM report r
+        LEFT JOIN user u ON r.user_id = u.id
+        WHERE r.id = #{id}
+    </select>
+    
+    <!-- 查询举报列表 -->
+    <select id="selectList" resultMap="ExtendedResultMap" parameterType="map">
+        SELECT r.*, u.username as user_username, u.realname as user_realname
+        FROM report r
+        LEFT JOIN user u ON r.user_id = u.id
+        <where>
+            <if test="userId != null">
+                AND r.user_id = #{userId}
+            </if>
+            <if test="reportType != null">
+                AND r.report_type = #{reportType}
+            </if>
+            <if test="status != null">
+                AND r.status = #{status}
+            </if>
+        </where>
+        ORDER BY r.create_time DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+    
+    <!-- 查询举报总数 -->
+    <select id="selectCount" resultType="int" parameterType="map">
+        SELECT COUNT(*) FROM report r
+        <where>
+            <if test="userId != null">
+                AND r.user_id = #{userId}
+            </if>
+            <if test="reportType != null">
+                AND r.report_type = #{reportType}
+            </if>
+            <if test="status != null">
+                AND r.status = #{status}
+            </if>
+        </where>
+    </select>
+    
+    <!-- 插入举报 -->
+    <insert id="insert" parameterType="com.industrial.trading.entity.Report" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO report (user_id, order_id, product_id, report_type, title, content, images, status)
+        VALUES (#{userId}, #{orderId}, #{productId}, #{reportType}, #{title}, #{content}, #{images}, #{status})
+    </insert>
+    
+    <!-- 更新举报 -->
+    <update id="update" parameterType="com.industrial.trading.entity.Report">
+        UPDATE report
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="adminReply != null">admin_reply = #{adminReply},</if>
+            <if test="handleTime != null">handle_time = #{handleTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+</mapper>

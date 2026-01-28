@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.industrial.trading.dao.LogisticsTrackMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.industrial.trading.entity.LogisticsTrack">
+        <id property="id" column="id"/>
+        <result property="logisticsId" column="logistics_id"/>
+        <result property="content" column="content"/>
+        <result property="location" column="location"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+    
+    <!-- 根据物流ID查询跟踪记录列表 -->
+    <select id="selectByLogisticsId" resultMap="BaseResultMap">
+        SELECT * FROM logistics_track 
+        WHERE logistics_id = #{logisticsId}
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 插入物流跟踪记录 -->
+    <insert id="insert" parameterType="com.industrial.trading.entity.LogisticsTrack" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO logistics_track (logistics_id, content, location)
+        VALUES (#{logisticsId}, #{content}, #{location})
+    </insert>
+    
+</mapper>
