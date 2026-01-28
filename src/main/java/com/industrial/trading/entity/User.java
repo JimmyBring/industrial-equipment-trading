@@ -6,26 +6,25 @@ import java.util.Date;
  * 用户实体类
  */
 public class User {
-    private Integer id;
+    private Long id;
     private String username;
     private String password;
-    private String realname;
+    private String realName;
     private String phone;
     private String email;
-    private String idCard;
-    private Integer userType;  // 1:买家 2:卖家
+    private Integer userType; // 1-买家，2-卖家，3-买卖双方
+    private Integer status; // 0-待审核，1-正常，2-禁用
     private String companyName;
     private String companyAddress;
     private String businessLicense;
-    private Integer status;  // 0:待审核 1:正常 2:禁用
     private Date createTime;
     private Date updateTime;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -45,12 +44,12 @@ public class User {
         this.password = password;
     }
 
-    public String getRealname() {
-        return realname;
+    public String getRealName() {
+        return realName;
     }
 
-    public void setRealname(String realname) {
-        this.realname = realname;
+    public void setRealName(String realName) {
+        this.realName = realName;
     }
 
     public String getPhone() {
@@ -69,20 +68,20 @@ public class User {
         this.email = email;
     }
 
-    public String getIdCard() {
-        return idCard;
-    }
-
-    public void setIdCard(String idCard) {
-        this.idCard = idCard;
-    }
-
     public Integer getUserType() {
         return userType;
     }
 
     public void setUserType(Integer userType) {
         this.userType = userType;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public String getCompanyName() {
@@ -107,14 +106,6 @@ public class User {
 
     public void setBusinessLicense(String businessLicense) {
         this.businessLicense = businessLicense;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public Date getCreateTime() {
